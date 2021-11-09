@@ -24,7 +24,7 @@ import {KeysNeeded} from './utils/common';
     .option('-v, --version', 'Version')
     .action((options) =>  {
       if(options.version) {
-        const ver = spawnSync('npm', ['info', '@a3labs/contentful', 'version'], {
+        const ver = spawnSync('npm', ['info', '@processway/contentful-migrate-content', 'version'], {
           encoding : 'utf8',
         });
         console.log(ver.stdout)      

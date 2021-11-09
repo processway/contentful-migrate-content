@@ -18,7 +18,7 @@ const common_1 = require("./utils/common");
         .option('-v, --version', 'Version')
         .action((options) => {
         if (options.version) {
-            const ver = child_process_1.spawnSync('npm', ['info', '@a3labs/contentful', 'version'], {
+            const ver = child_process_1.spawnSync('npm', ['info', '@processway/contentful-migrate-content', 'version'], {
                 encoding: 'utf8',
             });
             console.log(ver.stdout);
