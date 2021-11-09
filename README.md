@@ -1,11 +1,11 @@
 # Install
 
 `` 
-npm i -g contentful-migrate-content
+npm i -g @processway/contentful-migrate-content
 ``
 
 ``
-yarn global add contentful-migrate-content
+yarn global add @processway/contentful-migrate-content
 ``
 
 # Credentials
