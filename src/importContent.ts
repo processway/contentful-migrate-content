@@ -58,13 +58,35 @@ export default class importContentfulToMaster {
         this.forceUpdateContentTypesAndEntries = !!options.forceUpdateContentTypesAndEntries
         if (this.contentTypeIds.length > 0) {
             this.validTypes.push('contentTypes')
+            this.validTypes.push('assets')
             !this.ignoreEntries && this.validTypes.push('entries')
             this.validIds = this.validIds.concat(this.contentTypeIds);
         }
         if (this.entriesIds.length > 0) {
             !this.contentTypeIds.length && this.validTypes.push('entries')
+            !this.contentTypeIds.length && this.validTypes.push('assets')
             this.validIds = this.validIds.concat(this.entriesIds);
         }
+    }
+
+    private isValidEntry (type: string, contentTypeId: string, entryId: string) : boolean {
+        if (type !== 'entries' || this.ignoreEntries)  {
+            return false;
+        }
+        if (this.contentTypeIds.includes(contentTypeId) || this.entriesIds.length && this.validIds.includes(entryId))  {
+            return true;
+        }
+        return false
+    }
+
+    private isValidContentType (type: string, contentTypeId: string) : boolean {
+        if (type !== 'contentTypes')  {
+            return false;
+        }
+        if (this.contentTypeIds.length && this.validIds.includes(contentTypeId))  {
+            return true;
+        }
+        return false;
     }
 
     private importFilesFromContentful (base: string, filename: string) : void {
@@ -314,8 +336,7 @@ export default class importContentfulToMaster {
 
             _.forEach(newFile[type], (newModel: ContentTypeModelStructure) => {
                 
-                if(newModel.sys?.id && (!this.validIds.length || ((!this.entriesIds.length && !this.ignoreEntries) || this.validIds.includes(newModel.sys.id)))){
-                    console.info(newModel.sys?.id);
+                if(newModel.sys?.id && (type == 'assets' || !this.validIds.length || this.isValidEntry(type, newModel.sys?.contentType?.sys.id, newModel.sys.id) || this.isValidContentType(type, newModel.sys.id))){
 
                     let result = type === "editorInterfaces"
                         ? oldFile[type].findIndex((o: {sys: any}) => o.sys.contentType?.sys?.id === newModel.sys?.contentType?.sys?.id )

@@ -47,13 +47,33 @@ class importContentfulToMaster {
         this.forceUpdateContentTypesAndEntries = !!options.forceUpdateContentTypesAndEntries;
         if (this.contentTypeIds.length > 0) {
             this.validTypes.push('contentTypes');
+            this.validTypes.push('assets');
             !this.ignoreEntries && this.validTypes.push('entries');
             this.validIds = this.validIds.concat(this.contentTypeIds);
         }
         if (this.entriesIds.length > 0) {
             !this.contentTypeIds.length && this.validTypes.push('entries');
+            !this.contentTypeIds.length && this.validTypes.push('assets');
             this.validIds = this.validIds.concat(this.entriesIds);
         }
+    }
+    isValidEntry(type, contentTypeId, entryId) {
+        if (type !== 'entries' || this.ignoreEntries) {
+            return false;
+        }
+        if (this.contentTypeIds.includes(contentTypeId) || this.entriesIds.length && this.validIds.includes(entryId)) {
+            return true;
+        }
+        return false;
+    }
+    isValidContentType(type, contentTypeId) {
+        if (type !== 'contentTypes') {
+            return false;
+        }
+        if (this.contentTypeIds.length && this.validIds.includes(contentTypeId)) {
+            return true;
+        }
+        return false;
     }
     importFilesFromContentful(base, filename) {
         console.info("Importing content from the '" + base + "' branch... ");
@@ -270,9 +290,8 @@ class importContentfulToMaster {
                     this.newMigrationFile[type] = [];
                     this.totalEntitites[type] = 0;
                     lodash_1.default.forEach(newFile[type], (newModel) => {
-                        var _a, _b;
-                        if (((_a = newModel.sys) === null || _a === void 0 ? void 0 : _a.id) && (!this.validIds.length || ((!this.entriesIds.length && !this.ignoreEntries) || this.validIds.includes(newModel.sys.id)))) {
-                            console.info((_b = newModel.sys) === null || _b === void 0 ? void 0 : _b.id);
+                        var _a, _b, _c;
+                        if (((_a = newModel.sys) === null || _a === void 0 ? void 0 : _a.id) && (type == 'assets' || !this.validIds.length || this.isValidEntry(type, (_c = (_b = newModel.sys) === null || _b === void 0 ? void 0 : _b.contentType) === null || _c === void 0 ? void 0 : _c.sys.id, newModel.sys.id) || this.isValidContentType(type, newModel.sys.id))) {
                             let result = type === "editorInterfaces"
                                 ? oldFile[type].findIndex((o) => { var _a, _b, _c, _d, _e; return ((_b = (_a = o.sys.contentType) === null || _a === void 0 ? void 0 : _a.sys) === null || _b === void 0 ? void 0 : _b.id) === ((_e = (_d = (_c = newModel.sys) === null || _c === void 0 ? void 0 : _c.contentType) === null || _d === void 0 ? void 0 : _d.sys) === null || _e === void 0 ? void 0 : _e.id); })
                                 : oldFile[type].findIndex((o) => { var _a; return o.sys.id == ((_a = newModel.sys) === null || _a === void 0 ? void 0 : _a.id); });
